@@ -21,13 +21,14 @@ import "./parent-style.css";
 (window as any).isIframeLoaded = false;
 (window as any).__chatterbox = () => (document.querySelector(".chatterbox-iframe") as HTMLIFrameElement)?.contentWindow;
 
-function setUnreadCount(count) {
-    const notification = document.querySelector(".notification-badge") as HTMLSpanElement;
+function setUnreadCount({ userId, count }: { userId: string, count: number }) {
+    // const notification = document.querySelector(`#notification-badge-${userId}`) as HTMLSpanElement;
+    const notification = document.getElementById(`notification-badge-${userId}`) as HTMLSpanElement;
     if (count === 0) {
         notification.classList.add("hidden");
     }
     else {
-        notification.innerText = count;
+        notification.innerText = `${count}`;
         notification.classList.remove("hidden");
     }
 }
@@ -45,10 +46,10 @@ window.addEventListener("message", event => {
             resizeIframe(event.data);
             break;
         case "minimize":
-            toggleIframe();
+            toggleIframe(false);
             break;
         case "unread-message":
-            setUnreadCount(event.data.count);
+            setUnreadCount(event.data.payload);
             break;
         case "error":
             removeIframe();

@@ -71,7 +71,7 @@ export class RootViewModel extends ViewModel {
         this.navigation.push("account-setup");
     }
 
-    private async _showTimeline(loginPromise: Promise<void>) {
+    private async _showTimeline(loginPromise?: Promise<void>) {
         this._activeSection = "timeline";
         if (!this._chatterBoxViewModel) {
             this._chatterBoxViewModel = this.track(new ChatterboxViewModel(
@@ -122,34 +122,50 @@ export class RootViewModel extends ViewModel {
 
     private async _watchNotificationCount() {
         await this._client.loadStatus.waitFor(s => s === LoadStatus.Ready).promise;
-        const roomId = await this.platform.settingsStorage.getString("created-room-id") ?? this._config.auto_join_room;
-        const observable = await this._client.session.observeRoomStatus(roomId);
-        await observable.waitFor((status) => status === RoomStatus.Joined).promise;
-        const room = this._client.session.rooms.get(roomId);
-        let previousCount = room.notificationCount;
-        (window as any).sendNotificationCount(previousCount);
+        // const roomId = await this.platform.settingsStorage.getString("created-room-id") ?? this._config.auto_join_room;
+
+        const invitedUserRoomsString = await this.platform.settingsStorage.getString("invited_user_rooms");
+        let inviteUserRooms = [];
+        try {
+            inviteUserRooms = JSON.parse(invitedUserRoomsString);
+        } catch (e) {
+            console.error('Can not parse invited_user_rooms', invitedUserRoomsString, e);
+        }
+
+        inviteUserRooms.forEach(async ({ userId, roomId }) => {
+            const observable = await this._client.session.observeRoomStatus(roomId);
+            await observable.waitFor((status) => status === RoomStatus.Joined).promise;
+            const room = this._client.session.rooms.get(roomId);
+            const previousCount = room.notificationCount;
+            (window as any).sendNotificationCount(userId, previousCount);
+
+        });
+
         const subscription = {
             onUpdate(_: unknown, room) {
+                const userId = inviteUserRooms.find(({ roomId }) => roomId === room._roomId)?.userId;
+                if (!userId) return;
+
                 const newCount = room.notificationCount;
-                if (newCount !== previousCount) {
-                    if (!room.isUnread && newCount !== 0) {
-                        /*
-                        when chatterbox is maximized and there are previous unread messages,
-                        this condition is hit but we still want to send the notification count so that 
-                        the badge zeroes out.
-                        */
-                        room.clearUnread();
-                        return;
-                    }
-                    (window as any).sendNotificationCount(newCount);
-                    previousCount = newCount;
+                if (!room.isUnread && newCount !== 0) {
+                    (window as any).sendNotificationCount(userId, 0);
+
+                    /*
+                    when chatterbox is maximized and there are previous unread messages,
+                    this condition is hit but we still want to send the notification count so that 
+                    the badge zeroes out.
+                    */
+                    room.clearUnread();
+                    return;
                 }
+                (window as any).sendNotificationCount(userId, newCount);
             },
         };
         this.track(this._client.session.rooms.subscribe(subscription));
+
         this._isWatchingNotificationCount = true;
     }
-    
+
     minimizeChatterbox() {
         this._chatterBoxViewModel = this.disposeTracked(this._chatterBoxViewModel);
         this._accountSetupViewModel = this.disposeTracked(this._chatterBoxViewModel);
