@@ -19,27 +19,33 @@ import { isMobile } from "./common";
 const sizeCollection = {
     "desktop": {
         "account-setup": { height: "334px", width: "375px" },
-        "timeline": {height: "595px", width: "375px"}
+        "timeline": { height: "70vh", width: "375px" }
     },
     "mobile": {
         "account-setup": { height: "100vh", width: "100vw" },
-        "timeline": {height: "100vh", width: "100vw"}
+        "timeline": { height: "100vh", width: "100vw" }
     }
 }
 
-export function toggleIframe() {
+export function toggleIframe(isDifferentUser: boolean) {
     const iframeElement = document.querySelector(".chatterbox-iframe") as HTMLIFrameElement;
     const startButtonDiv = document.querySelector(".start") as HTMLDivElement;
-    if (iframeElement.style.display !== "none") {
+
+    if (isDifferentUser && iframeElement.style.display === "block") {
+        iframeElement.contentWindow.postMessage({ action: "minimize" }, "*");
+        iframeElement.contentWindow.postMessage({ action: "maximize" }, "*");
+        return;
+    }
+    if (iframeElement.style.display && iframeElement.style.display !== "none") {
         iframeElement.style.display = "none";
         document.querySelector(".start-chat-btn").classList.remove("start-background-minimized");
-        iframeElement.contentWindow.postMessage({ action: "minimize" }, "*");;
+        iframeElement.contentWindow.postMessage({ action: "minimize" }, "*");
         if (isMobile()) {
             startButtonDiv.style.display = "block";
         }
     }
     else {
-        iframeElement.contentWindow.postMessage({ action: "maximize" }, "*");;
+        iframeElement.contentWindow.postMessage({ action: "maximize" }, "*");
         iframeElement.style.display = "block";
         document.querySelector(".start-chat-btn").classList.add("start-background-minimized");
         if (isMobile()) {
@@ -50,7 +56,7 @@ export function toggleIframe() {
 
 export function resizeIframe(data) {
     const { view } = data;
-    const type = isMobile()? "mobile": "desktop";
+    const type = isMobile() ? "mobile" : "desktop";
     const size = sizeCollection[type][view];
     if (!size) { return; }
     const { height, width } = size;

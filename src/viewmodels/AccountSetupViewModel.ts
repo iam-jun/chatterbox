@@ -16,7 +16,7 @@ limitations under the License.
 
 import { ViewModel, Client, LoadStatus } from "hydrogen-view-sdk";
 import { IChatterboxConfig } from "../types/IChatterboxConfig";
-import { generatePassword, generateUsername } from "../random";
+// import { generatePassword, generateUsername } from "../random";
 import "hydrogen-view-sdk/style.css";
 
 
@@ -32,54 +32,65 @@ export class AccountSetupViewModel extends ViewModel {
         super(options);
         this._client = options.client;
         this._config = options.config;
-        this._startRegistration();
+        this._startLogin();
     }
 
-    private async _startRegistration(): Promise<void> {
-        const password = generatePassword(10);
-        const maxAttempts = 10;
-        for (let i = 0; i < maxAttempts; ++i) {
-            try {
-                const username = `${this._config.username_prefix}-${generateUsername(10)}`;
-                const flowSelector = (flows) => {
-                    const allowedStages = [
-                        "m.login.registration_token",
-                        "org.matrix.msc3231.login.registration_token",
-                        "m.login.terms",
-                        "m.login.dummy"
-                    ];
-                    for (const flow of flows) {
-                        // Find the first flow that does not contain any unsupported stages but contains Token registration stage.
-                        const containsUnsupportedStage = flow.stages.some(stage => !allowedStages.includes(stage));
-                        const containsTokenStage = flow.stages.includes("m.login.registration_token") ||
-                            flow.stages.includes("org.matrix.msc3231.login.registration_token");
-                        if (!containsUnsupportedStage && containsTokenStage) {
-                            return flow;
-                        }
-                    }
-                }
-                this._registration = await this._client.startRegistration(this._homeserver, username, password, "Chatterbox", flowSelector);
-                this._startStage = await this._registration.start();
-                let stage = this._startStage;
-                while (stage && stage.type !== "m.login.terms") {
-                    stage = stage.nextStage;
-                }
-                if (!stage) {
-                    // If terms login stage is not found, go straight to completeRegistration()
-                    this.completeRegistration();
-                    return;
-                }
-                this._privacyPolicyLink = stage.privacyPolicy.en?.url;
-                this.emitChange("privacyPolicyLink");
-                break;
-            }
-            catch (e) {
-                if (e.errcode !== "M_USER_IN_USE") {
-                    throw e;
-                }
-            }
-        }
+
+    private async _startLogin() {
+        const authenPaths = this._config.token?.split("+authen+");
+        const username = authenPaths[0];
+        const password = authenPaths[1];
+        const loginMethod = await this._client.queryLogin("matrix.org").result;
+        await this._client.startWithLogin(loginMethod.password(username, password));
+        this.navigation.push("timeline");
+
     }
+
+    // private async _startRegistration(): Promise<void> {
+    //     const password = generatePassword(10);
+    //     const maxAttempts = 10;
+    //     for (let i = 0; i < maxAttempts; ++i) {
+    //         try {
+    //             const username = `${this._config.username_prefix}-${generateUsername(10)}`;
+    //             const flowSelector = (flows) => {
+    //                 const allowedStages = [
+    //                     "m.login.registration_token",
+    //                     "org.matrix.msc3231.login.registration_token",
+    //                     "m.login.terms",
+    //                     "m.login.dummy"
+    //                 ];
+    //                 for (const flow of flows) {
+    //                     // Find the first flow that does not contain any unsupported stages but contains Token registration stage.
+    //                     const containsUnsupportedStage = flow.stages.some(stage => !allowedStages.includes(stage));
+    //                     const containsTokenStage = flow.stages.includes("m.login.registration_token") ||
+    //                         flow.stages.includes("org.matrix.msc3231.login.registration_token");
+    //                     if (!containsUnsupportedStage && containsTokenStage) {
+    //                         return flow;
+    //                     }
+    //                 }
+    //             }
+    //             this._registration = await this._client.startRegistration(this._homeserver, username, password, "Chatterbox", flowSelector);
+    //             this._startStage = await this._registration.start();
+    //             let stage = this._startStage;
+    //             while (stage && stage.type !== "m.login.terms") {
+    //                 stage = stage.nextStage;
+    //             }
+    //             if (!stage) {
+    //                 // If terms login stage is not found, go straight to completeRegistration()
+    //                 this.completeRegistration();
+    //                 return;
+    //             }
+    //             this._privacyPolicyLink = stage.privacyPolicy.en?.url;
+    //             this.emitChange("privacyPolicyLink");
+    //             break;
+    //         }
+    //         catch (e) {
+    //             if (e.errcode !== "M_USER_IN_USE") {
+    //                 throw e;
+    //             }
+    //         }
+    //     }
+    // }
 
     async completeRegistration() {
         this._showButtonSpinner = true;
@@ -118,9 +129,9 @@ export class AccountSetupViewModel extends ViewModel {
         this.navigation.push("minimize");
     }
 
-    private get _homeserver(): string {
-        return this._config.homeserver;
-    }
+    // private get _homeserver(): string {
+    //     return this._config.homeserver;
+    // }
 
     get privacyPolicyLink() {
         return this._privacyPolicyLink;

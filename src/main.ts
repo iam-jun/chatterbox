@@ -90,7 +90,7 @@ async function main() {
     platform.setNavigation(navigation);
     const urlRouter = createRouter({ navigation, history: platform.history });
     const startMinimized = shouldStartMinimized();
-    const rootViewModel = new RootViewModel(config, {platform, navigation, urlCreator: urlRouter, startMinimized});
+    const rootViewModel = new RootViewModel(config, { platform, navigation, urlCreator: urlRouter, startMinimized });
     rootViewModel.start();
     const rootView = new RootView(rootViewModel);
     root.appendChild(rootView.mount());
@@ -133,9 +133,11 @@ function attachLogExportToWindow(platform): void {
 function hideOnError() {
     // When an error occurs, log it and then hide everything!
     const handler = e => {
-        Sentry.captureException(e, { tags: {
-            "fatalError": true
-        }});
+        Sentry.captureException(e, {
+            tags: {
+                "fatalError": true
+            }
+        });
         if (e.message === "ResizeObserver loop completed with undelivered notifications." ||
             e.message === "ResizeObserver loop limit exceeded" ||
             // hydrogen renders an <img> with src = undefined while the image is being decrypted
@@ -165,8 +167,8 @@ function hideOnError() {
     window.parent?.postMessage({ action: "minimize" }, "*");
 };
 
-(window as any).sendNotificationCount = function (count: number) {
-    window.parent?.postMessage({ action: "unread-message", count }, "*");
+(window as any).sendNotificationCount = function (userId: string, count: number) {
+    window.parent?.postMessage({ action: "unread-message", payload: { userId, count } }, "*");
 };
 
 (window as any).sendError = function () {

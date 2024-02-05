@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import { TemplateView } from "hydrogen-view-sdk";
-import chatterboxLogo from "../res/chat-bubbles.svg";
 import { FooterViewModel } from "../../viewmodels/FooterViewModel";
 
 export class FooterView extends TemplateView<FooterViewModel> {
@@ -23,28 +22,28 @@ export class FooterView extends TemplateView<FooterViewModel> {
         super(value);
     }
 
-    render(t, vm) {
+    render(t) {
         return t.div({ className: "FooterView" }, [
             t.div([
-                t.img({ src: chatterboxLogo, className: "FooterView_logo" }),
-                t.a(
-                    {
-                        className: "FooterView_chatterbox-branding",
-                        href: vm.chatterboxLink,
-                        target: "_top",
-                        rel: "noopener"
-                    },
-                    "Chatterbox"
-                ),
+                // t.img({ src: chatterboxLogo, className: "FooterView_logo" }),
+                // t.a(
+                //     {
+                //         className: "FooterView_chatterbox-branding",
+                //         href: vm.chatterboxLink,
+                //         target: "_top",
+                //         rel: "noopener"
+                //     },
+                //     "Chatterbox"
+                // ),
             ]),
             t.a(
-                {
-                    className: "FooterView_matrix-branding",
-                    href: vm.matrixLink,
-                    target: "_top",
-                    rel: "noopener"
-                },
-                "Powered by Matrix"
+                // {
+                //     className: "FooterView_matrix-branding",
+                //     href: vm.matrixLink,
+                //     target: "_top",
+                //     rel: "noopener"
+                // },
+                // "Powered by Matrix"
             ),
         ]);
     }

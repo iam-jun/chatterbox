@@ -15,14 +15,15 @@ limitations under the License.
 */
 
 export interface IChatterboxConfig {
-	homeserver: string;
+    homeserver: string;
     // Internal room-id of the room to which chatterbox should join
-	auto_join_room: string;
+    auto_join_room: string;
     // String that is to be prepended to the generated random usernames
     username_prefix: string;
     // If specified, chatterbox will create a dm with this user
     // This option takes precedence over 'auto_join_room'
     invite_user: string;
+    invite_users: string[];
     // If set to true, chatterbox will not let the user send any messages until the operator has joined
     // Only applicable when invite_user is configured
     // The CB user is given a powerlevel that is low enough to prevent them from sending messages
