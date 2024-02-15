@@ -33,18 +33,29 @@ export async function loadStartButton() {
         const config = await fetch(new URL(configLocation, hostRoot));
         const configJson = await config.json();
         invite_users = configJson?.invite_users;
+
+        if (!configJson?.button_class_name) {
+            throw new Error("button_class_name is not defined in the config");
+        }
+
+        if (invite_users.length === 0) {
+            invite_users.push(null);
+        }
+
+        invite_users.forEach((user) => {
+            // const button = createStartButton(user);
+            // container.appendChild(button);
+            createStartButton(configJson?.button_class_name, user);
+        });
+
+        window.parent?.postMessage({
+            action: "chatterbox-loaded",
+        }, "*");
     } catch (e) {
         console.error('Can not load config', e);
     }
 
-    if (invite_users.length === 0) {
-        invite_users.push(null);
-    }
 
-    invite_users.forEach((user) => {
-        const button = createStartButton(user);
-        container.appendChild(button);
-    });
 
     document.body.appendChild(container);
     if (window.localStorage.getItem("chatterbox-should-load-in-background")) {
@@ -57,14 +68,16 @@ export async function loadStartButton() {
     }
 }
 
-function createStartButton(userId?: string) {
-    const button = document.createElement("button");
-    button.className = "start-chat-btn";
-    if (userId) {
-        button.id = `${userId}`;
+function createStartButton(className: string, userId?: string) {
+    // const button = document.createElement("button");
+    // button.className = "start-chat-btn";
+
+    const button = document.getElementById(`${className}-${userId}`);
+
+    if (!button) {
+        // button.id = `${userId}`;
+        return null;
     }
-    button.setAttribute('aria-label', 'Start chat');
-    button.innerHTML = userId ? userId.replace('@', '').replace(':matrix.org', '') : '';
     button.onclick = () => {
         const isDifferentUser = !!(window as any).CURRENT_USERNAME && ((window as any).CURRENT_USERNAME !== userId);
         (window as any).CURRENT_USERNAME = userId;
@@ -75,7 +88,7 @@ function createStartButton(userId?: string) {
         }
     }
     button.appendChild(createNotificationBadge(userId));
-    return button;
+    // return button;
 }
 
 function createNotificationBadge(userId?: string) {
@@ -105,7 +118,7 @@ function loadIframe(minimized = false) {
     iframe.className = "chatterbox-iframe";
     document.body.appendChild(iframe);
     (window as any).isIframeLoaded = true;
-    document.querySelector(".start-chat-btn").classList.add("start-background-minimized");
+    // document.querySelector(".start-chat-btn").classList.add("start-background-minimized");
     if (isMobile()) {
         (document.querySelector(".start") as HTMLDivElement).style.display =
             "none";

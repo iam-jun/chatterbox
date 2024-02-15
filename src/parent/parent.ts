@@ -24,6 +24,9 @@ import "./parent-style.css";
 function setUnreadCount({ userId, count }: { userId: string, count: number }) {
     // const notification = document.querySelector(`#notification-badge-${userId}`) as HTMLSpanElement;
     const notification = document.getElementById(`notification-badge-${userId}`) as HTMLSpanElement;
+
+    if (!notification) return;
+
     if (count === 0) {
         notification.classList.add("hidden");
     }
