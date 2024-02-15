@@ -11,10 +11,29 @@ body {
 
 #chatterbox {
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #F4F6FA;
+}
+
+#chatterbox-video-call {
+    position: absolute;
     width: 100vw;
     height: 100vh;
     border-radius: 12px;
     background: #F4F6FA;
+    display: none;
+}
+
+#chatterbox-video-call>iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
 }
 
 .AccountSetupView {
@@ -103,7 +122,8 @@ body {
     margin: 10.5px 0;
 }
 
-.FooterView>div, .FooterView>a {
+.FooterView>div,
+.FooterView>a {
     display: flex;
     align-items: center;
 }
@@ -151,6 +171,14 @@ body {
     width: 20px;
     border: none;
     cursor: pointer;
+}
+
+.RoomHeaderView_menu_video_call {
+    background: url("../res/video-call.svg") no-repeat center;
+    width: 30px;
+    border: none;
+    cursor: pointer;
+    margin-right: 8px;
 }
 
 .RoomHeaderView .avatar {

@@ -16,6 +16,7 @@ limitations under the License.
 
 import { RoomViewModel, ViewModel, RoomStatus } from "hydrogen-view-sdk";
 import { createCustomTileClassForEntry } from "./tiles";
+import { v4 as UUIDV4 } from "uuid";
 
 export class ChatterboxViewModel extends ViewModel {
     private _roomViewModel?: typeof RoomViewModel;
@@ -67,6 +68,20 @@ export class ChatterboxViewModel extends ViewModel {
         await this._roomViewModel.load();
         this._roomViewModel.on("change", this.emitOnRoomViewModelChange);
         this.emitChange("roomViewModel");
+
+        window.addEventListener('message', function (event) {
+            console.log('----------------- parent message received: ' + JSON.stringify(event.data));
+            let message = { data: event.data, origin: event.origin }
+            if (message.data.response && message.data.api == "toWidget"
+                || !message.data.response && message.data.api == "fromWidget") {
+                let json = JSON.stringify(event.data);
+                console.log('----------message sent: ' + json);
+
+                this.window.postMessage(json);
+            } else {
+                console.log('!!!!parent message received (ignored): ' + JSON.stringify(event.data));
+            }
+        });
     }
 
     private emitOnRoomViewModelChange() {
@@ -158,6 +173,79 @@ export class ChatterboxViewModel extends ViewModel {
     minimize() {
         (window as any).sendMinimizeToParent();
         this.navigation.push("minimize");
+    }
+
+    startCall() {
+        const iframeContainer = document.getElementById("chatterbox-video-call");
+        const iframe = document.createElement("iframe");
+        iframe.setAttribute("id", "chatterbox-video-call-iframe");
+
+        const widgetId = UUIDV4();
+        const clientId = UUIDV4();
+        var url = new URL("https://call.element.io/room#");
+
+        const roomId = this._roomViewModel._room._roomId;
+        const deviceId = this._session.deviceId;
+        const userId = this._session.userId;
+
+        if (!deviceId) return;
+
+        const params = {
+            userId,
+            roomId,
+            widgetId,
+            "displayName": "agil.operator",
+            "lang": "en-US",
+            "theme": "light",
+            clientId,
+            deviceId,
+            "baseUrl": "https://matrix-client.matrix.org/",
+            // "parentUrl": "https://call.element.io",
+            parentUrl: window.location.origin,
+            "skipLobby": "true",
+            "confineToRoom": "true",
+            "appPrompt": "false",
+            "hideHeader": "true",
+            "preload": "false",
+            "perParticipantE2EE": "true"
+        };
+
+        const urlSearchParams = new URLSearchParams(params).toString();
+        url.search = urlSearchParams;
+
+        console.log('--------Full URL', url.toString());
+
+        iframe.setAttribute("src", url.toString());
+
+
+
+        iframeContainer.appendChild(iframe);
+        iframeContainer.style.display = "block";
+
+        // iframe.contentWindow.addEventListener('message', function (event) {
+        //     console.log('-----------------message received: ' + JSON.stringify(event.data));
+        //     let message = { data: event.data, origin: event.origin }
+        //     if (message.data.response && message.data.api == "toWidget"
+        //         || !message.data.response && message.data.api == "fromWidget") {
+        //         let json = JSON.stringify(event.data);
+        //         console.log('----------message sent: ' + json);
+
+        //         this.window.postMessage(json, "*");
+        //         // iframe.contentWindow.postMessage(json, "*");
+        //     } else {
+        //         console.log('message received (ignored): ' + JSON.stringify(event.data));
+        //     }
+        // });
+
+        // iframe.contentWindow.postMessage("hello", "*");
+
+
+        // iframe.contentWindow.postMessage = function (data) {
+        //     console.log('-----------------iframe.contentWindow.postMessage: ' + JSON.stringify(data));
+        //     // let json = JSON.stringify(message);
+        //     // console.log('----------message sent: ' + json);
+        // }
+
     }
 
     get timelineViewModel() {

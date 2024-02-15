@@ -28,20 +28,20 @@ export class ChatterboxView extends TemplateView<ChatterboxViewModel> {
     render(t, vm) {
         return t.div({ className: "ChatterboxView", },
             [
-            t.mapView(
-                (vm) => (vm.roomViewModel ? vm : null),
-                (vm) => (vm ? new RoomHeaderView(vm) : null)
-            ),
-            t.mapView(
-                (vm) => vm.timelineViewModel,
-                (vm) => (vm ? new TimelineView(vm, viewClassForTile) : new LoadingView())
-            ),
-            t.mapView(
-                (vm) => vm.messageComposerViewModel,
-                (vm) => (vm?.kind === "composer" ? new MessageComposer(vm) : new WaitingForOperatorJoinView())
-            ),
-            t.view(new FooterView(vm.footerViewModel)),
-        ]);
+                t.mapView(
+                    (vm) => (vm.roomViewModel ? vm : null),
+                    (vm) => (vm ? new RoomHeaderView(vm) : null)
+                ),
+                t.mapView(
+                    (vm) => vm.timelineViewModel,
+                    (vm) => (vm ? new TimelineView(vm, viewClassForTile) : new LoadingView())
+                ),
+                t.mapView(
+                    (vm) => vm.messageComposerViewModel,
+                    (vm) => (vm?.kind === "composer" ? new MessageComposer(vm) : new WaitingForOperatorJoinView())
+                ),
+                t.view(new FooterView(vm.footerViewModel)),
+            ]);
     }
 }
 
@@ -51,11 +51,16 @@ class RoomHeaderView extends TemplateView<ChatterboxViewModel> {
     }
 
     render(t, vm: ChatterboxViewModel) {
-        const avatar = vm.customAvatarURL ? t.img({ className:"avatar", src: vm.customAvatarURL }) : t.view(new AvatarView(vm.roomViewModel, 30));
+        const avatar = vm.customAvatarURL ? t.img({ className: "avatar", src: vm.customAvatarURL }) : t.view(new AvatarView(vm.roomViewModel, 30));
         return t.div({ className: "RoomHeaderView" }, [
             avatar,
             t.div({ className: "RoomHeaderView_name" }, vm => vm.roomName),
             t.div({ className: "RoomHeaderView_menu" }, [
+                t.button({
+                    className: "RoomHeaderView_menu_video_call", onClick: () => {
+                        vm.startCall();
+                    }
+                }),
                 t.button({
                     className: "RoomHeaderView_menu_minimize", onClick: () => {
                         vm.minimize();
