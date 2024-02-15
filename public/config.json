@@ -17,6 +17,7 @@
         "@blurzade:matrix.org",
         "@jun.coder:matrix.org"
     ],
+    "button_class_name": "chatterbox-button",
     "encrypt_room": false,
     "avatar": "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
     "disable_composer_until_operator_join": false

@@ -13,7 +13,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
             height: 500vh;
         }
-        
+
         .container {
             display: flex;
             flex-direction: column;
@@ -28,22 +28,37 @@
         .para {
             padding-bottom: 15px;
         }
+
+        .start-chat-btn {
+            /* width: 64px; */
+            min-width: 100px;
+            height: 64px;
+            border: none;
+            border-radius: 8px;
+            margin-right: 1rem;
+            cursor: pointer;
+            color: white;
+            position: relative;
+            text-transform: capitalize;
+            background: linear-gradient(180deg, #7657F2 0%, #5C56F5 100%);
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 12px 32px -2px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="title">This is a website</div>
-        <div class="content">
-            <div class="para">Elit aute occaecat do labore ea mollit cupidatat. Eiusmod non mollit excepteur adipisicing deserunt et do fugiat ea. Sit commodo laborum labore dolor ad nulla dolore aute sit occaecat irure magna. Cupidatat dolore sint Lorem sint id laboris pariatur dolore laborum ullamco ad. Cillum ut ea nisi proident in cillum. Pariatur esse dolor est laborum ad nostrud. Exercitation esse commodo minim ipsum aute duis pariatur dolore culpa.</div>
-            <div class="para">Elit aute occaecat do labore ea mollit cupidatat. Eiusmod non mollit excepteur adipisicing deserunt et do fugiat ea. Sit commodo laborum labore dolor ad nulla dolore aute sit occaecat irure magna. Cupidatat dolore sint Lorem sint id laboris pariatur dolore laborum ullamco ad. Cillum ut ea nisi proident in cillum. Pariatur esse dolor est laborum ad nostrud. Exercitation esse commodo minim ipsum aute duis pariatur dolore culpa.</div>
-            <div class="para">Elit aute occaecat do labore ea mollit cupidatat. Eiusmod non mollit excepteur adipisicing deserunt et do fugiat ea. Sit commodo laborum labore dolor ad nulla dolore aute sit occaecat irure magna. Cupidatat dolore sint Lorem sint id laboris pariatur dolore laborum ullamco ad. Cillum ut ea nisi proident in cillum. Pariatur esse dolor est laborum ad nostrud. Exercitation esse commodo minim ipsum aute duis pariatur dolore culpa.</div>
-        </div>
     </div>
     <script>
         window.CHATTERBOX_CONFIG_LOCATION = "./config.json";
+        setTimeout(() => {
+            window.postMessage({ action: "init-chatterbox" }, "*");
+        }, 1000);
     </script>
     <script src="./src/parent/parent.ts" type="module" id="chatterbox-script"></script>
+
+    <button id="chatterbox-button-@jameslai:matrix.org" class="start-chat-btn">Open Chatterbox</button>
 </body>
 
 </html>

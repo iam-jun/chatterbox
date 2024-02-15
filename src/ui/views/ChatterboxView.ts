@@ -65,7 +65,7 @@ class RoomHeaderView extends TemplateView<ChatterboxViewModel> {
                     className: "RoomHeaderView_menu_minimize", onClick: () => {
                         vm.minimize();
                     }
-                })
+                }, "✕")
             ]),
         ]);
     }
