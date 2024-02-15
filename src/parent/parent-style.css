@@ -1,7 +1,7 @@
 .chatterbox-iframe {
     position: fixed;
     right: 20px;
-    bottom: 100px;
+    bottom: 20px;
     border: none;
     border-radius: 12px;
     /*
@@ -47,14 +47,14 @@
 
 .notification-badge {
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: 12px;
+    height: 12px;
     color: white;
     background-color: #FF5B55;
-    right: -10px;
-    top: -10px;
+    right: -6px;
+    top: -6px;
     border-radius: 100%;
-    font-size: 12px;
+    font-size: 8px;
     font-weight: bold;
     display: flex;
     justify-content: center;
