@@ -39,6 +39,9 @@ function setUnreadCount({ userId, count }: { userId: string, count: number }) {
 window.addEventListener("message", event => {
     const { action } = event.data;
     switch (action) {
+        case "init-chatterbox":
+            loadStartButton();
+            break;
         case "resize-iframe":
             if (event.data.view === "timeline") {
                 // Chatterbox has made it to the timeline!
@@ -59,5 +62,3 @@ window.addEventListener("message", event => {
             break;
     }
 });
-
-loadStartButton();

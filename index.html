@@ -52,6 +52,9 @@
     </div>
     <script>
         window.CHATTERBOX_CONFIG_LOCATION = "./config.json";
+        setTimeout(() => {
+            window.postMessage({ action: "init-chatterbox" }, "*");
+        }, 1000);
     </script>
     <script src="./src/parent/parent.ts" type="module" id="chatterbox-script"></script>
 
