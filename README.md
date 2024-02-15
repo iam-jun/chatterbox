@@ -48,6 +48,31 @@ Assuming that the build output (inside `/target`) is hosted at `<root>` (eg: cha
 	<script src="<root>/assets/parent.js" type="module" id="chatterbox-script"></script>
 ```
 
+Prepare the buttons:
+
+```html
+<div class="btn-container padding">
+            <ChatButton name="James Lai" userId={"@jameslai:matrix.org"} />
+            <ChatButton name="Zn Lai" userId={"@blurzade:matrix.org"} />
+            <ChatButton name="Jun Diep" userId={"@jun.coder:matrix.org"} />
+        </div>
+```
+
+ In the screen that contains chat buttons, postMessage to init chatterbox:
+```js
+ window.postMessage({ action: "init-chatterbox" });
+```
+
+If you want to control loading state, lister window event like this:
+```js
+window.addEventListener("message", (event) => {
+            const data = event?.data;
+            if (data.action === "chatterbox-loaded") {
+                app.set({ isChatterboxLoaded: true });
+            }
+        });
+```
+
 ## Testing
 
 Chatterbox comes with a suite of integration tests, using cypress.
