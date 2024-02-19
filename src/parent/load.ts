@@ -14,28 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { IChatterboxConfig } from "../types/IChatterboxConfig";
 import { isMobile } from "./common";
 import { toggleIframe } from "./iframe";
 
 const parentHostRoot = (document.querySelector("#chatterbox-script") as HTMLScriptElement).src;
 const hostRoot = new URL(parentHostRoot).origin;
 
-export async function loadStartButton() {
-    loadCSS();
-    const container = document.createElement("div");
-    container.className = "start";
+export async function loadStartButton(config: IChatterboxConfig) {
+    if(!config) {
+        throw new Error("Config is not defined");
+    }
 
-    const configLocation = (window as any).CHATTERBOX_CONFIG_LOCATION as string;
+    (window as any).CHATTERBOX_CONFIG = config;
+
+    loadCSS();
 
     let invite_users = [];
     try {
-        //@ts-ignore
-        const config = await fetch(new URL(configLocation, hostRoot));
-        const configJson = await config.json();
-        invite_users = configJson?.invite_users;
+        invite_users = config?.invite_users;
 
-        if (!configJson?.button_class_name) {
-            throw new Error("button_class_name is not defined in the config");
+        if (!config?.button_id_prefix) {
+            throw new Error("button_id_prefix is not defined in the config");
         }
 
         if (invite_users.length === 0) {
@@ -45,7 +45,7 @@ export async function loadStartButton() {
         invite_users.forEach((user) => {
             // const button = createStartButton(user);
             // container.appendChild(button);
-            createStartButton(configJson?.button_class_name, user);
+            createStartButton(config?.button_id_prefix, user);
         });
 
         window.parent?.postMessage({
@@ -57,7 +57,6 @@ export async function loadStartButton() {
 
 
 
-    document.body.appendChild(container);
     if (window.localStorage.getItem("chatterbox-should-load-in-background")) {
         /**
          * If chatterbox made it to the timeline before, load the chatterbox app in background.
@@ -76,7 +75,7 @@ function createStartButton(className: string, userId?: string) {
 
     if (!button) {
         // button.id = `${userId}`;
-        return null;
+        throw new Error(`Button not found for user ${userId} with id ${className}-${userId}`);
     }
     button.onclick = () => {
         const isDifferentUser = !!(window as any).CURRENT_USERNAME && ((window as any).CURRENT_USERNAME !== userId);
@@ -88,6 +87,8 @@ function createStartButton(className: string, userId?: string) {
         }
     }
     button.appendChild(createNotificationBadge(userId));
+
+    console.log(`created button for user ${userId}`)
     // return button;
 }
 
@@ -107,12 +108,12 @@ function loadCSS() {
 
 function loadIframe(minimized = false) {
     const iframe = document.createElement("iframe");
-    const configLocation = (window as any).CHATTERBOX_CONFIG_LOCATION;
-    if (!configLocation) {
-        throw new Error("CHATTERBOX_CONFIG_LOCATION is not set");
-    }
+    // const configLocation = (window as any).CHATTERBOX_CONFIG_LOCATION;
+    // if (!configLocation) {
+    //     throw new Error("CHATTERBOX_CONFIG_LOCATION is not set");
+    // }
     iframe.src = new URL(
-        `../chatterbox.html?config=${configLocation}${minimized ? "&minimized=true" : ""}`,
+        `../chatterbox.html?${minimized ? "&minimized=true" : ""}`,
         hostRoot
     ).href;
     iframe.className = "chatterbox-iframe";
