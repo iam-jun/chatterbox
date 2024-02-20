@@ -51,14 +51,28 @@
         <div class="title">This is a website</div>
     </div>
     <script>
-        window.CHATTERBOX_CONFIG_LOCATION = "./config.json";
+        const config = {
+                "homeserver": "https://matrix.org",
+                "username_prefix": "foobar",
+                "token": "agil.operator+authen+ABCxyz123@",
+                "invite_users": [
+                    // "@jameslai:matrix.org",
+                    "@blurzade:matrix.org",
+                    // "@jun.coder:matrix.org"
+                ],
+                "button_id_prefix": "chatterbox-button",
+                "encrypt_room": false,
+                "avatar": "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
+                "disable_composer_until_operator_join": false
+            };
+
         setTimeout(() => {
-            window.postMessage({ action: "init-chatterbox" }, "*");
+            window.postMessage({ action: "init-chatterbox", payload: config }, "*");
         }, 1000);
     </script>
     <script src="./src/parent/parent.ts" type="module" id="chatterbox-script"></script>
 
-    <button id="chatterbox-button-@jameslai:matrix.org" class="start-chat-btn">Open Chatterbox</button>
+    <button id="chatterbox-button-@blurzade:matrix.org" class="start-chat-btn">Open Chatterbox</button>
 </body>
 
 </html>

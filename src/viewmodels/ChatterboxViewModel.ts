@@ -40,14 +40,11 @@ export class ChatterboxViewModel extends ViewModel {
                 rooms.push(room);
                 invitedUserRooms.push({ userId: user, roomId: room._roomId });
             }
-        } else if (this._options.config["invite_user"]) {
-            const room = await this.createRoomWithUserSpecifiedInConfig(this._options.config["invite_user"]);
-            rooms.push(room);
-        } else if (this._options.config["auto_join_room"]) {
+        }  else if (this._options.config["auto_join_room"]) {
             const room = await this.joinRoomSpecifiedInConfig();
             rooms.push(room);
         } else {
-            throw new Error("ConfigError: You must either specify 'invite_user' or 'auto_join_room'");
+            throw new Error("ConfigError: You must either specify 'invite_users' or 'auto_join_room'");
         }
 
         this.platform.settingsStorage.setString("invited_user_rooms", JSON.stringify(invitedUserRooms));
@@ -142,8 +139,7 @@ export class ChatterboxViewModel extends ViewModel {
 
     private async findPreviouslyCreatedRoom(userId: string): Promise<any | null> {
         const createdRoomId = await this.platform.settingsStorage.getString(`created-room-id-${userId}`);
-        // const lastKnownInviteUserId = await this.platform.settingsStorage.getString("invite-user");
-        // const currentInviteUserId = this._options.config["invite_user"];
+       
         if (createdRoomId) {
             return this._session.rooms.get(createdRoomId);
         }

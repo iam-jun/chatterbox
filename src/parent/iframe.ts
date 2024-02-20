@@ -38,7 +38,6 @@ export function toggleIframe(isDifferentUser: boolean) {
     }
     if (iframeElement.style.display && iframeElement.style.display !== "none") {
         iframeElement.style.display = "none";
-        // document.querySelector(".start-chat-btn").classList.remove("start-background-minimized");
         iframeElement.contentWindow.postMessage({ action: "minimize" }, "*");
         if (isMobile()) {
             startButtonDiv.style.display = "block";
@@ -47,7 +46,6 @@ export function toggleIframe(isDifferentUser: boolean) {
     else {
         iframeElement.contentWindow.postMessage({ action: "maximize" }, "*");
         iframeElement.style.display = "block";
-        // document.querySelector(".start-chat-btn").classList.add("start-background-minimized");
         if (isMobile()) {
             startButtonDiv.style.display = "none";
         }

@@ -22,7 +22,6 @@ import "./parent-style.css";
 (window as any).__chatterbox = () => (document.querySelector(".chatterbox-iframe") as HTMLIFrameElement)?.contentWindow;
 
 function setUnreadCount({ userId, count }: { userId: string, count: number }) {
-    // const notification = document.querySelector(`#notification-badge-${userId}`) as HTMLSpanElement;
     const notification = document.getElementById(`notification-badge-${userId}`) as HTMLSpanElement;
 
     if (!notification) return;
@@ -40,7 +39,7 @@ window.addEventListener("message", event => {
     const { action } = event.data;
     switch (action) {
         case "init-chatterbox":
-            loadStartButton();
+            loadStartButton(event.data.payload);
             break;
         case "resize-iframe":
             if (event.data.view === "timeline") {
