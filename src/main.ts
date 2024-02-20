@@ -38,16 +38,6 @@ const assetPaths = {
 
 const rootDivId = "#chatterbox";
 
-async function fetchConfig(): Promise<IChatterboxConfig> {
-    const queryParams = new URLSearchParams(window.location.search);
-    const configLink = queryParams.get("config");
-    if (!configLink) {
-        throw new Error("Root element does not have config specified");
-    }
-    const config: IChatterboxConfig = await (await fetch(configLink)).json();
-    return config;
-}
-
 function shouldStartMinimized(): boolean {
     return !!new URLSearchParams(window.location.search).get("minimized");
 }
@@ -59,7 +49,7 @@ async function main() {
         throw new Error("No element with id as 'chatterbox' found!");
     }
     root.className = "hydrogen";
-    const config = await fetchConfig();
+    const config: IChatterboxConfig = (window.parent as any).CHATTERBOX_CONFIG;
 
     if (config.sentry) {
         Sentry.init({
@@ -70,8 +60,8 @@ async function main() {
         Sentry.setTag("homeserver", config.homeserver);
         Sentry.setTag("encrypt_room", config.encrypt_room);
 
-        if (config.invite_user) {
-            Sentry.setTag("mode", "invite_user");
+        if (config.invite_users) {
+            Sentry.setTag("mode", "invite_users");
         } else if (config.auto_join_room) {
             Sentry.setTag("mode", "auto_join_room");
         } else {

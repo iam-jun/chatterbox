@@ -23,28 +23,6 @@ export class FooterView extends TemplateView<FooterViewModel> {
     }
 
     render(t) {
-        return t.div({ className: "FooterView" }, [
-            t.div([
-                // t.img({ src: chatterboxLogo, className: "FooterView_logo" }),
-                // t.a(
-                //     {
-                //         className: "FooterView_chatterbox-branding",
-                //         href: vm.chatterboxLink,
-                //         target: "_top",
-                //         rel: "noopener"
-                //     },
-                //     "Chatterbox"
-                // ),
-            ]),
-            t.a(
-                // {
-                //     className: "FooterView_matrix-branding",
-                //     href: vm.matrixLink,
-                //     target: "_top",
-                //     rel: "noopener"
-                // },
-                // "Powered by Matrix"
-            ),
-        ]);
+        return t.div({ className: "FooterView" });
     }
 }
