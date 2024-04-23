@@ -40,8 +40,18 @@ export class ChatterboxViewModel extends ViewModel {
                 rooms.push(room);
                 invitedUserRooms.push({ userId: user, roomId: room._roomId });
             }
-        }  else if (this._options.config["auto_join_room"]) {
-            const room = await this.joinRoomSpecifiedInConfig();
+        } else if (this._options.config["invite_rooms"]) {
+            const invitedRooms = this._options.config["invite_rooms"];
+            const data = Object.keys(invitedRooms);
+            for (const userId of data) {
+                const roomId =invitedRooms[userId];
+                const room = await this.handleGetOrCreateRoom(roomId, userId);
+                rooms.push(room);
+                invitedUserRooms.push({ userId, roomId });
+            }
+        } else if (this._options.config["auto_join_room"]) {
+            const roomId = this._options.config["auto_join_room"];
+            const room = await this.joinRoomSpecifiedInConfig(roomId);
             rooms.push(room);
         } else {
             throw new Error("ConfigError: You must either specify 'invite_users' or 'auto_join_room'");
@@ -49,8 +59,21 @@ export class ChatterboxViewModel extends ViewModel {
 
         this.platform.settingsStorage.setString("invited_user_rooms", JSON.stringify(invitedUserRooms));
 
-        const parentRoomId = (window.parent as any).CURRENT_USERNAME;
-        const roomId = await this.platform.settingsStorage.getString(`created-room-id-${parentRoomId}`);
+        const currentOpenedUser = (window.parent as any).CURRENT_USERNAME;
+        const invitedUserRoomsString = await this.platform.settingsStorage.getString("invited_user_rooms");
+        let inviteUserRooms = [];
+        try {
+            inviteUserRooms = JSON.parse(invitedUserRoomsString);
+        } catch (e) {
+            console.error('Can not parse invited_user_rooms', invitedUserRoomsString, e);
+        }
+
+        const userRoom = inviteUserRooms.find((item) => item?.userId === currentOpenedUser);
+
+        const roomId = userRoom?.roomId;
+
+        // const parentRoomId = (window.parent as any).CURRENT_USERNAME;
+        // const roomId = await this.platform.settingsStorage.getString(`created-room-id-${parentRoomId}`);
         const openingRoom = rooms.find(room => room._roomId === roomId);
 
         this._roomViewModel = this.track(new RoomViewModel(this.childOptions({
@@ -68,6 +91,16 @@ export class ChatterboxViewModel extends ViewModel {
 
     private emitOnRoomViewModelChange() {
         this.emitChange("roomViewModel");
+    }
+
+    private async handleGetOrCreateRoom(roomId: string, userId: string) {
+        let room = this.joinRoomSpecifiedInConfig(roomId);
+        
+        if (room) {
+            return room;
+        }
+
+        return this.createRoomWithUserSpecifiedInConfig(userId)
     }
 
     private async createRoomWithUserSpecifiedInConfig(userId: string) {
@@ -107,8 +140,8 @@ export class ChatterboxViewModel extends ViewModel {
         return room;
     }
 
-    private async joinRoomSpecifiedInConfig() {
-        const roomId = this._options.config["auto_join_room"];
+    private async joinRoomSpecifiedInConfig(roomId: string) {
+        // const roomId = this._options.config["auto_join_room"];
         let room = this._session.rooms.get(roomId);
         if (!room) {
             // user is not in specified room, so join it

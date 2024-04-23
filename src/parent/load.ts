@@ -34,6 +34,10 @@ export async function loadStartButton(config: IChatterboxConfig) {
     try {
         invite_users = config?.invite_users;
 
+        if(!invite_users){
+            invite_users = Object.keys(config.invite_rooms)
+        }
+
         if (!config?.button_id_prefix) {
             throw new Error("button_id_prefix is not defined in the config");
         }
