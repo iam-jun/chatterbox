@@ -52,19 +52,38 @@
     </div>
     <script>
         const config = {
-                "homeserver": "https://matrix.org",
-                "username_prefix": "foobar",
-                "token": "agil.operator+authen+ABCxyz123@",
-                "invite_users": [
-                    // "@jameslai:matrix.org",
-                    "@blurzade:matrix.org",
-                    // "@jun.coder:matrix.org"
-                ],
-                "button_id_prefix": "chatterbox-button",
-                "encrypt_room": false,
-                "avatar": "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
-                "disable_composer_until_operator_join": false
-            };
+            "homeserver": "https://matrix.org",
+            "username_prefix": "foobar",
+            "token": "agil.operator+authen+ABCxyz123@",
+            "invite_rooms": {
+                '@jorimtan:matrix.org': "!lpShcLwnoHXlCewdjP:matrix.org",
+                '@ruiiying:matrix.org': "!RjvIzauwnMRZyrsomn:matrix.org",
+                '@jameslai:matrix.org': "!KpDDfmHLgUFCGXoYCL:matrix.org",
+            },
+            // "invite_rooms": [
+            //     {
+            //         user_id: '@jorimtan:matrix.org',
+            //         room_id: "!lpShcLwnoHXlCewdjP@matrix.org",
+            //     },
+            //     {
+            //         user_id: '@@ruiiying:matrix.org',
+            //         room_id: "!RjvIzauwnMRZyrsomn@matrix.org",
+            //     },
+            //     {
+            //         user_id: '@@jameslai:matrix.org',
+            //         room_id: "!KpDDfmHLgUFCGXoYCL@matrix.org",
+            //     },
+            // ],
+            // "invite_users": [
+            //     // "@jameslai:matrix.org",
+            //     "@blurzade:matrix.org",
+            //     // "@jun.coder:matrix.org"
+            // ],
+            "button_id_prefix": "chatterbox-button",
+            "encrypt_room": false,
+            "avatar": "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
+            "disable_composer_until_operator_join": false
+        };
 
         setTimeout(() => {
             window.postMessage({ action: "init-chatterbox", payload: config }, "*");
@@ -72,7 +91,9 @@
     </script>
     <script src="./src/parent/parent.ts" type="module" id="chatterbox-script"></script>
 
-    <button id="chatterbox-button-@blurzade:matrix.org" class="start-chat-btn">Open Chatterbox</button>
+    <button id="chatterbox-button-@jorimtan:matrix.org" class="start-chat-btn">Open jorimtan</button>
+    <button id="chatterbox-button-@ruiiying:matrix.org" class="start-chat-btn">Open ruiiying</button>
+    <button id="chatterbox-button-@jameslai:matrix.org" class="start-chat-btn">Open jameslai</button>
 </body>
 
 </html>
